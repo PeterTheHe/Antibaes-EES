@@ -1,7 +1,3 @@
-""" This work is licensed under a Creative Commons Attribution 3.0 Unported License.
-    Frank Zalkow, 2012-2013 """
-""" Modified a bit save sepectral data to file for use by a CNN """
-
 import os 
 import numpy as np
 from matplotlib import pyplot as plt
