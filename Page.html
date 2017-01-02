@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+
+<script
+src="https://code.jquery.com/jquery-3.1.1.min.js"
+integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script src="//cdn.rawgit.com/namuol/cheet.js/master/cheet.min.js"
+        type="text/javascript"></script>
+<title>Robot Diver</title>
+<style>
+html, body {
+height: 90%;
+margin: 0;
+padding: 0;
+width: 100%;
+}
+
+body {
+display: table;
+}
+
+.my-block {
+text-align: center;
+display: table-cell;
+vertical-align: middle;
+}
+form { margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="my-block">
+
+<h1> Current Instructions </h1>
+<h5><em> Drone Control to Major Tom </em></h5>
+
+<br/><hr/><br/>
+
+<?   var docName = "EESDroneAction"; //We have a doc called EESDroneAction to store the data. It's lazy ik but bare easy.
+var file, files = DriveApp.getFilesByName(docName); //Retrieve the ID
+
+//Check if the doc exists. If it doesn't, return nothing
+if (files.hasNext ()){
+file = files.next(); 
+} else {
+return "";
+}
+
+var docId = file.getId();
+var doc = DocumentApp.openById(docId); //Get the doc
+var text = doc.getBody().editAsText().getText(); //Retrieve text as a string
+?>
+
+<h4 id="current-instructions"> <?!= text.trim(); ?> </h4>
+
+<br/><hr/><br/>
+
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Up" data-opposite-to="Down"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Down" data-opposite-to="Up"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Right" data-opposite-to="Left"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Left" data-opposite-to="Right"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Forwards" data-opposite-to="Back"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Back" data-opposite-to="Forwards"/>
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<footer>
+<h4>&copy; 2016 The Antibaes</h4>
+<h5> Lovingly built by Rohan and Peter </h5>
+<br/>
+<small> Send multiple instructions with <a href="https://script.google.com/macros/s/AKfycbxYrOE4D02GMGRUpAsADew4OK5_EivN3Rm4xZnVgufurI9AxTE/exec?control&logo"> LOGO </a></small>
+</footer>
+
+<div id="easter-egg-host"> </div>
+
+</div>
+<script>
+
+$(".instruction-btn").click(function(){
+   var currentInstructions = $("#current-instructions").text();
+   var myInstruction = $(this).val();
+   var oppositeInstruction = $(this).data("opposite-to");
+   
+   //Remove conflicting orders 
+   if (currentInstructions.includes(oppositeInstruction)){
+      $("#current-instructions").text(currentInstructions.trim().replace(oppositeInstruction, ""));
+   }
+   
+   currentInstructions = $("#current-instructions").text();
+
+   //Add the new roder
+   if (currentInstructions.includes(myInstruction)){
+      $("#current-instructions").text(currentInstructions.trim().replace(myInstruction, ""));
+   }
+   else
+   {
+      $("#current-instructions").text(currentInstructions.trim() + " " + myInstruction);
+   }
+   
+   google.script.run.withFailureHandler(error).doActions( $("#current-instructions").text().trim() );
+});
+
+
+function error(){
+
+   alert ("APESHIT! SOMETHING WENT WRONG");
+
+}
+
+//Konami code bc why not
+cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
+  $("#easter-egg-host").html('<iframe src="https://player.vimeo.com/video/30680384?autoplay=1&loop=1&title=0&byline=0&portrait=0" width="1" height="1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
+});
+
+</script>
+    
+  </body>
+</html>
+
+
