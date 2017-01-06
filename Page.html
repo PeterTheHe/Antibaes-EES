@@ -63,10 +63,10 @@ var text = doc.getBody().editAsText().getText(); //Retrieve text as a string
 
 <input type="button" class="instruction-btn btn btn-primary btn-sm" value="Up" data-opposite-to="Down"/>
 <input type="button" class="instruction-btn btn btn-primary btn-sm" value="Down" data-opposite-to="Up"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Right" data-opposite-to="Left"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Left" data-opposite-to="Right"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Forwards" data-opposite-to="Back"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Back" data-opposite-to="Forwards"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Right" data-opposite-to="Left Forwards Back"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Left" data-opposite-to="Right Forwards Back"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Forwards" data-opposite-to="Back Left Right"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Back" data-opposite-to="Forwards Left Right"/>
 
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
@@ -85,11 +85,13 @@ var text = doc.getBody().editAsText().getText(); //Retrieve text as a string
 $(".instruction-btn").click(function(){
    var currentInstructions = $("#current-instructions").text();
    var myInstruction = $(this).val();
-   var oppositeInstruction = $(this).data("opposite-to");
+   var oppositeInstructions = $(this).data("opposite-to").split(" ");
    
    //Remove conflicting orders 
-   if (currentInstructions.includes(oppositeInstruction)){
-      $("#current-instructions").text(currentInstructions.trim().replace(oppositeInstruction, ""));
+   for (var i = 0; i < oppositeInstructions.length; i++){
+      if (currentInstructions.includes(oppositeInstructions[i])){      
+         $("#current-instructions").text(currentInstructions.trim().replace(oppositeInstructions[i], ""));
+      }
    }
    
    currentInstructions = $("#current-instructions").text();
