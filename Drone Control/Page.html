@@ -63,16 +63,18 @@ var text = doc.getBody().editAsText().getText(); //Retrieve text as a string
 
 <input type="button" class="instruction-btn btn btn-primary btn-sm" value="Up" data-opposite-to="Down"/>
 <input type="button" class="instruction-btn btn btn-primary btn-sm" value="Down" data-opposite-to="Up"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Right" data-opposite-to="Left"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Left" data-opposite-to="Right"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Forwards" data-opposite-to="Back"/>
-<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Back" data-opposite-to="Forwards"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Right" data-opposite-to="Left Forwards Back"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Left" data-opposite-to="Right Forwards Back"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Forwards" data-opposite-to="Back Left Right"/>
+<input type="button" class="instruction-btn btn btn-primary btn-sm" value="Back" data-opposite-to="Forwards Left Right"/>
 
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 <footer>
 <h4>&copy; 2016 The Antibaes</h4>
 <h5> Lovingly built by Rohan and Peter </h5>
+<br/>
+<small> Send multiple instructions with <a href="https://script.google.com/macros/s/AKfycbxYrOE4D02GMGRUpAsADew4OK5_EivN3Rm4xZnVgufurI9AxTE/exec?control&logo"> LOGO </a></small>
 </footer>
 
 <div id="easter-egg-host"> </div>
@@ -83,11 +85,13 @@ var text = doc.getBody().editAsText().getText(); //Retrieve text as a string
 $(".instruction-btn").click(function(){
    var currentInstructions = $("#current-instructions").text();
    var myInstruction = $(this).val();
-   var oppositeInstruction = $(this).data("opposite-to");
+   var oppositeInstructions = $(this).data("opposite-to").split(" ");
    
    //Remove conflicting orders 
-   if (currentInstructions.includes(oppositeInstruction)){
-      $("#current-instructions").text(currentInstructions.trim().replace(oppositeInstruction, ""));
+   for (var i = 0; i < oppositeInstructions.length; i++){
+      if (currentInstructions.includes(oppositeInstructions[i])){      
+         $("#current-instructions").text(currentInstructions.trim().replace(oppositeInstructions[i], ""));
+      }
    }
    
    currentInstructions = $("#current-instructions").text();

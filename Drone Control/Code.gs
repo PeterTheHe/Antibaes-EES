@@ -1,6 +1,9 @@
 function doGet(e) {
   
   if (e.parameter.control != undefined){
+    if (e.parameter.logo != undefined){
+      return HtmlService.createTemplateFromFile("Logo").evaluate().setTitle("Drone Control to Major Tom");
+    }
    return HtmlService.createTemplateFromFile("Page").evaluate().setTitle("Drone Control to Major Tom");
   }
   
