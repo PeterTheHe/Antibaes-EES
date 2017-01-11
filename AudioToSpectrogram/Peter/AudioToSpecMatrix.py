@@ -53,8 +53,8 @@ def logscale_spec(spec, sr=44100, factor=20.):
 """ plot spectrogram"""
 def plotstft(audiopath, binsize=2**10, colormap="jet"):
     samplerate, samples = wav.read(audiopath)
-    s = stft(samples, binsize)
-    
+    s = stft(samples, binsize) 
+    s = s[::1,::3] #Downsampling
     filename = audiopath.split("\\")[-1].split(".")[0] # "C:/Soundfile.wav" becomes "Soundfile"
     directoryname = audiopath[:-len(audiopath.split("\\")[-1])] # "C:/Soundfile.wav" becomes "C:"    
 
