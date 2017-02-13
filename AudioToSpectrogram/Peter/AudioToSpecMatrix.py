@@ -21,7 +21,7 @@ def stft(sig, frameSize, overlapFac=0.5, window=np.hanning):
     frames = stride_tricks.as_strided(samples, shape=(cols, frameSize), strides=(samples.strides[0]*hopSize, samples.strides[0])).copy()
     frames *= win
     
-    return np.fft.rfft(frames)    
+    return np.fft.rfft(frames)
     
 """ scale frequency axis logarithmically """    
 def logscale_spec(spec, sr=44100, factor=20.):
@@ -49,12 +49,36 @@ def logscale_spec(spec, sr=44100, factor=20.):
             freqs += [np.mean(allfreqs[scale[i]:scale[i+1]])]
     
     return newspec, freqs
+    
+    
+""" bubble frequency transform """
+def bubble_transform(s):
+    bubble_high = s[:,range(0,29)] #top 840hz get lots of attention
+    bubble_mids = s[:,range(30,482)]
+    bubble_mids = bubble_mids[::1,::43] #downsample
+    bubble_low= s[:,range(483,512)]
+    result = np.concatenate((bubble_high, bubble_mids), axis=1) #join them up
+    result = np.concatenate((result, bubble_low), axis=1)
+    return result
+    
+""" Extract the Loudest Bit """
+def get_peak(ims):
+    index = 0
+    maxvol = -10000000000 #How loud is the loudest thing?
+    for i in range(0,len(ims)):
+        vol = ims[i,:].sum()
+        if (vol > maxvol):
+            index = i
+            maxvol = vol
+    #print ("Peak at sample" + str(index + 1) + " of " + str(len(ims) + 1) + " - " + str(maxvol))
+    return ims[index,:]
 
-""" plot spectrogram"""
+""" plot spectrogram """
 def plotstft(audiopath, binsize=2**10, colormap="jet"):
     samplerate, samples = wav.read(audiopath)
     s = stft(samples, binsize) 
     s = s[::1,::1] #Downsampling
+
     filename = audiopath.split("\\")[-1].split(".")[0] # "C:/Soundfile.wav" becomes "Soundfile"
     directoryname = audiopath[:-len(audiopath.split("\\")[-1])] # "C:/Soundfile.wav" becomes "C:"    
 
@@ -90,6 +114,67 @@ def plotstft(audiopath, binsize=2**10, colormap="jet"):
     #Uncomment if you want it to pop up with a graph.
     #plt.show() 
     plt.clf()
+                
+    """ Now repeat with the bubble transform (aka. I know nothing about this)"""
+    s = bubble_transform(s)  
+                
+    sshow, freq = logscale_spec(s, factor=1.0, sr=samplerate)
+    ims = 20.*np.log10(np.abs(sshow)/10e-6) # amplitude to decibel
+    
+    timebins, freqbins = np.shape(ims)
+    
+    plt.figure(figsize=(15, 7.5))
+
+    np.savetxt (directoryname + "/matrix_bft/" + filename + ".txt", np.transpose(ims))
+
+    plt.imshow(np.transpose(ims), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
+    plt.colorbar()
+    
+    xlocs = np.float32(np.linspace(0, timebins-1, 5))
+    plt.xticks(xlocs, ["%.02f" % l for l in ((xlocs*len(samples)/timebins)+(0.5*binsize))/samplerate])
+    ylocs = np.int16(np.round(np.linspace(0, freqbins-1, 10)))
+    plt.yticks(ylocs, ["%.02f" % freq[i] for i in ylocs])
+
+    plt.savefig(directoryname + "/spectrogram_bft/" + filename+'.png',
+         dpi=100, # Dots per inch
+         frameon='false',
+         aspect='normal',
+         pad_inches=0) # Spectrogram saved as a .png 
+    
+    #Uncomment if you want it to pop up with a graph.
+    #plt.show() 
+    plt.clf()
+    
+    """ And now with just the peaks """
+       
+    sshow, freq = logscale_spec(s, factor=1.0, sr=samplerate)
+    ims = 20.*np.log10(np.abs(sshow)/10e-6) # amplitude to decibel
+    ims_peak = get_peak(ims)
+    
+    timebins = 4
+    freqbins = len(ims_peak)
+    
+    plt.figure(figsize=(15, 7.5))
+
+    np.savetxt (directoryname + "/matrix_bft_peak/" + filename + ".txt", np.transpose(ims_peak))
+
+    plt.imshow(np.transpose(np.tile(ims_peak, (4,1))), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
+    plt.colorbar()
+    
+    xlocs = np.float32(np.linspace(0, timebins-1, 5))
+    plt.xticks(xlocs, ["%.02f" % l for l in ((xlocs*len(samples)/timebins)+(0.5*binsize))/samplerate])
+    ylocs = np.int16(np.round(np.linspace(0, freqbins-1, 10)))
+    plt.yticks(ylocs, ["%.02f" % freq[i] for i in ylocs])
+
+    plt.savefig(directoryname + "/spectrogram_bft_peak/" + filename+'.png',
+         dpi=100, # Dots per inch
+         frameon='false',
+         aspect='normal',
+         pad_inches=0) # Spectrogram saved as a .png 
+    
+    #Uncomment if you want it to pop up with a graph.
+    #plt.show() 
+    plt.clf()
 
     
 directory = input('Where are the sounds stored? ')
@@ -100,6 +185,18 @@ if not os.path.exists(directory + "/matrix"):
     
 if not os.path.exists(directory + "/spectrogram"):
     os.makedirs(directory + "/spectrogram")
+    
+if not os.path.exists(directory + "/matrix_bft"):
+    os.makedirs(directory + "/matrix_bft")
+    
+if not os.path.exists(directory + "/spectrogram_bft"):
+    os.makedirs(directory + "/spectrogram_bft")
+    
+if not os.path.exists(directory + "/matrix_bft_peak"):
+    os.makedirs(directory + "/matrix_bft_peak")
+    
+if not os.path.exists(directory + "/spectrogram_bft_peak"):
+    os.makedirs(directory + "/spectrogram_bft_peak")
 
 #Loop through all files in sound directory
 for filename in os.listdir(directory):
