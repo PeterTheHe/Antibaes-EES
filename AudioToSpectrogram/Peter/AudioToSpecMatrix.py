@@ -53,7 +53,7 @@ def logscale_spec(spec, sr=44100, factor=20.):
     
 """ bubble frequency transform """
 def bubble_transform(s):
-    bubble_high = s[:,range(0,29)] #top 840hz get lots of attention
+    bubble_high = s[:,range(0,29)] #top 1200hz get lots of attention
     bubble_mids = s[:,range(30,482)]
     bubble_mids = bubble_mids[::1,::43] #downsample
     bubble_low= s[:,range(483,512)]
@@ -130,6 +130,11 @@ def plotstft(audiopath, binsize=2**10, colormap="jet"):
     plt.imshow(np.transpose(ims), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
     plt.colorbar()
     
+    plt.xlabel("time (s)")
+    plt.ylabel("frequency (hz)")
+    plt.xlim([0, timebins-1])
+    plt.ylim([0, freqbins])
+
     xlocs = np.float32(np.linspace(0, timebins-1, 5))
     plt.xticks(xlocs, ["%.02f" % l for l in ((xlocs*len(samples)/timebins)+(0.5*binsize))/samplerate])
     ylocs = np.int16(np.round(np.linspace(0, freqbins-1, 10)))
@@ -160,6 +165,11 @@ def plotstft(audiopath, binsize=2**10, colormap="jet"):
 
     plt.imshow(np.transpose(np.tile(ims_peak, (4,1))), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
     plt.colorbar()
+    
+    plt.xlabel("time (s)")
+    plt.ylabel("frequency (hz)")
+    plt.xlim([0, timebins-1])
+    plt.ylim([0, freqbins])
     
     xlocs = np.float32(np.linspace(0, timebins-1, 5))
     plt.xticks(xlocs, ["%.02f" % l for l in ((xlocs*len(samples)/timebins)+(0.5*binsize))/samplerate])
